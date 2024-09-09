@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Autor</title>
+</head>
+<body>
+    <h1>Cadastrar Autor</h1>
+    
+    <form id="autorForm">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required><br><br>
+        
+        <label for="biografia">Biografia:</label>
+        <textarea id="biografia" name="biografia" required></textarea><br><br>
+
+        <label for="nacionalidade">Nacionalidade:</label>
+        <input type="text" id="nacionalidade" name="nacionalidade" required><br><br>
+
+        <button type="submit">Cadastrar Autor</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('autorForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            const nome = document.getElementById('nome').value;
+            const biografia = document.getElementById('biografia').value;
+            const nacionalidade = document.getElementById('nacionalidade').value;
+
+            const autorData = {
+                nome: nome,
+                biografia: biografia,
+                nacionalidade: nacionalidade
+            };
+
+            fetch('http://localhost:8080/api/autores', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(autorData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = 'Autor cadastrado com sucesso!';
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Erro ao cadastrar o autor.';
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+</body>
+</html>

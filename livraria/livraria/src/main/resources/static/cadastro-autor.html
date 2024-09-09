@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Autor</title>
+    <script defer src="cadastro-autor.js"></script>
+</head>
+<body>
+    <h1>Cadastro de Autor</h1>
+    
+    <form id="autorForm">
+        <label for="nome">Nome do Autor:</label>
+        <input type="text" id="nome" name="nome" required>
+        <button type="submit">Cadastrar Autor</button>
+    </form>
+    
+    <h2>Autores Cadastrados</h2>
+    <ul id="listaAutores">
+        <!-- Autores serão listados aqui -->
+    </ul>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('autorForm');
+    const listaAutores = document.getElementById('listaAutores');
+
+    // Função para listar todos os autores
+    function listarAutores() {
+        fetch('http://localhost:8081/api/autores')
+            .then(response => response.json())
+            .then(autores => {
+                listaAutores.innerHTML = ''; // Limpa a lista
+                autores.forEach(autor => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${autor.nome} <button data-id="${autor.id}">Deletar</button>`;
+                    listaAutores.appendChild(li);
+                });
+
+                // Adiciona o listener para o botão de deletar
+                document.querySelectorAll('button[data-id]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const autorId = this.getAttribute('data-id');
+                        deletarAutor(autorId);
+                    });
+                });
+            })
+            .catch(error => console.error('Erro ao listar autores:', error));
+    }
+
+    // Função para cadastrar um novo autor
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const autorData = { nome: document.getElementById('nome').value };
+
+        fetch('http://localhost:8081/api/autores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(autorData)
+        })
+            .then(response => response.json())
+            .then(() => {
+                form.reset();  // Limpa o formulário
+                listarAutores();  // Atualiza a lista de autores
+            })
+            .catch(error => console.error('Erro ao cadastrar autor:', error));
+    });
+
+    // Função para deletar autor
+    function deletarAutor(autorId) {
+        fetch(`http://localhost:8081/api/autores/${autorId}`, {
+            method: 'DELETE'
+        })
+            .then(() => {
+                listarAutores();  // Atualiza a lista de autores
+            })
+            .catch(error => console.error('Erro ao deletar autor:', error));
+    }
+
+    // Chama a função para listar autores quando a página carrega
+    listarAutores();
+});
+    
+    </script>
+    
+    
+    
+    
+    
+</body>
+</html>
